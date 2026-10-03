@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Copartment - Find verified accommodation for your journey. Perfect for interns, students, NYSC corps members, and young professionals in Nigeria.">
+    <meta name="theme-color" content="#0f172a">
+    <title>Copartment - Find Your Perfect Accommodation</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-logo">
+                <span class="logo-icon">⌂</span>
+                <span class="logo-text">Copartment</span>
+            </a>
+            
+            <button class="navbar-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="navbar-menu">
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#featured" class="nav-link">Properties</a></li>
+                <li><a href="pages/about.html" class="nav-link">About</a></li>
+                <li><a href="pages/faq.html" class="nav-link">Help & FAQ</a></li>
+                <li><a href="pages/login.html" class="nav-link nav-link-secondary">Login</a></li>
+                <li><a href="pages/register.html" class="btn btn-primary nav-cta">Get Started</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Find a place that fits your journey</h1>
+            <p class="hero-subtitle">Discover verified accommodation tailored for interns, students, NYSC members, and young professionals across Nigeria.</p>
+            
+            <div class="hero-cta">
+                <a href="pages/properties.html" class="btn btn-primary btn-lg">Find Accommodation</a>
+                <a href="pages/register.html?role=host" class="btn btn-outline btn-lg">List Your Space</a>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="hero-placeholder">
+                <div class="placeholder-icon">🏠</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Module -->
+    <section class="search-module">
+        <div class="search-container">
+            <h2>Start your search</h2>
+            <form id="hero-search-form" class="search-form">
+                <div class="search-group">
+                    <label for="search-location">Location</label>
+                    <input 
+                        type="text" 
+                        id="search-location" 
+                        placeholder="City or area" 
+                        class="search-input"
+                    >
+                </div>
+
+                <div class="search-group">
+                    <label for="search-type">Type</label>
+                    <select id="search-type" class="search-input">
+                        <option value="">All Types</option>
+                        <option value="room">Single Room</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="shared">Shared Space</option>
+                        <option value="hostel">Hostel</option>
+                    </select>
+                </div>
+
+                <div class="search-group">
+                    <label for="search-price">Max Price (₦)</label>
+                    <input 
+                        type="number" 
+                        id="search-price" 
+                        placeholder="Any price" 
+                        class="search-input"
+                    >
+                </div>
+
+                <div class="search-group">
+                    <label for="search-date">Move-in</label>
+                    <input 
+                        type="date" 
+                        id="search-date" 
+                        class="search-input"
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="align-self: flex-end;">Search</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Featured Properties -->
+    <section id="featured" class="featured-section">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Featured Listings</h2>
+                <p>Verified properties ready for you</p>
+                <a href="pages/properties.html" class="link-primary">View all →</a>
+            </div>
+
+            <div class="properties-grid" id="featured-properties">
+                <!-- Properties loaded by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="section-container">
+            <h2>How Copartment Works</h2>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Search</h3>
+                    <p>Browse verified listings in your preferred location. Filter by price, type, and amenities.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Compare</h3>
+                    <p>View detailed property information, images, and host profiles to make informed decisions.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Request</h3>
+                    <p>Submit an accommodation request or book directly. Communicate with the host.</p>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Move In</h3>
+                    <p>Once confirmed, arrange logistics and move to your new accommodation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Copartment -->
+    <section class="why-copartment">
+        <div class="section-container">
+            <h2>Why Choose Copartment?</h2>
+            
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon">✓</div>
+                    <h3>Verified Listings</h3>
+                    <p>Every property and host is verified for authenticity and safety.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🎯</div>
+                    <h3>Transparent Information</h3>
+                    <p>Complete property details, pricing, and host information upfront.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🔍</div>
+                    <h3>Easy Discovery</h3>
+                    <p>Powerful search and filter tools to find exactly what you need.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🤝</div>
+                    <h3>Direct Communication</h3>
+                    <p>Message hosts directly to ask questions and negotiate terms.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">🛡️</div>
+                    <h3>Safety First</h3>
+                    <p>Security features and support to protect both guests and hosts.</p>
+                </div>
+
+                <div class="benefit-card">
+                    <div class="benefit-icon">⏱️</div>
+                    <h3>Flexible Terms</h3>
+                    <p>Short-term, medium-term, and long-term accommodation options.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Locations -->
+    <section class="locations-section">
+        <div class="section-container">
+            <h2>Popular Locations</h2>
+            
+            <div class="locations-grid" id="locations-grid">
+                <!-- Locations loaded by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials-section">
+        <div class="section-container">
+            <h2>What Users Say</h2>
+            
+            <div class="testimonials-grid" id="testimonials-grid">
+                <!-- Testimonials loaded by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="section-container">
+            <h2>Your next place could be here</h2>
+            <p>Join thousands of users finding perfect accommodation on Copartment</p>
+            
+            <div class="cta-buttons">
+                <a href="pages/properties.html" class="btn btn-primary btn-lg">Find Accommodation</a>
+                <a href="pages/register.html?role=host" class="btn btn-outline btn-lg">List Your Space</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>About Copartment</h4>
+                    <ul>
+                        <li><a href="pages/about.html">About Us</a></li>
+                        <li><a href="pages/contact.html">Contact</a></li>
+                        <li><a href="pages/faq.html">FAQs</a></li>
+                        <li><a href="#">Blog</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>For Guests</h4>
+                    <ul>
+                        <li><a href="pages/properties.html">Browse Properties</a></li>
+                        <li><a href="pages/login.html">Login</a></li>
+                        <li><a href="pages/register.html">Register</a></li>
+                        <li><a href="#">Safety Tips</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>For Hosts</h4>
+                    <ul>
+                        <li><a href="pages/register.html?role=host">Become a Host</a></li>
+                        <li><a href="#">Host Resources</a></li>
+                        <li><a href="#">Host Guide</a></li>
+                        <li><a href="#">Host Community</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="pages/terms.html">Terms of Service</a></li>
+                        <li><a href="pages/privacy.html">Privacy Policy</a></li>
+                        <li><a href="#">Safety Policy</a></li>
+                        <li><a href="#">Dispute Resolution</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div class="footer-social">
+                    <a href="#" aria-label="Twitter">𝕏</a>
+                    <a href="#" aria-label="Facebook">f</a>
+                    <a href="#" aria-label="Instagram">📷</a>
+                    <a href="#" aria-label="LinkedIn">in</a>
+                </div>
+
+                <p>&copy; 2024 Copartment. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/utils.js"></script>
+    <script src="data/mock-data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

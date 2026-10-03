@@ -1,2 +1,37 @@
-# copartment
-Copartment - Professional Accommodation Marketplace for Interns, Students, and Young Professionals
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Copartment</title>
+  <link rel="stylesheet" href="../../css/style.css" />
+  <link rel="stylesheet" href="../../css/components.css" />
+  <link rel="stylesheet" href="../../css/responsive.css" />
+</head>
+<body data-page="admin">
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="../../index.html" class="navbar-logo">
+        <span class="logo-icon">⌂</span>
+        <span class="logo-text">Copartment</span>
+      </a>
+      <ul class="navbar-menu">
+        <li><a href="index.html" class="nav-link">Overview</a></li>
+        <li><a href="#" class="nav-link">Users</a></li>
+        <li><a href="#" class="nav-link">Properties</a></li>
+        <li><a href="#" class="nav-link">Verification</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-section">
+    <div class="container">
+      <div id="admin-dashboard-root"></div>
+    </div>
+  </main>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../data/mock-data.js"></script>
+  <script src="../../js/app.js"></script>
+</body>
+</html>

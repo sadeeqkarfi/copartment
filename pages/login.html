@@ -1,0 +1,809 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const body = document.body;
+  const page = body.dataset.page || 'home';
+
+  const navToggle = document.querySelector('.navbar-toggle');
+  const navMenu = document.querySelector('.navbar-menu');
+
+  if (navToggle && navMenu) {
+    navToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('open');
+    });
+  }
+
+  const showToast = (message) => {
+    let toast = document.querySelector('.toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2400);
+  };
+
+  window.showToast = showToast;
+
+  const renderFeaturedProperties = () => {
+    const target = document.getElementById('featured-properties');
+    if (!target) return;
+
+    const properties = window.CopartmentUtils.getProperties().filter((property) => property.featured || property.verified).slice(0, 4);
+    target.innerHTML = properties.map((property) => `
+      <article class="property-card">
+        <div class="property-image">
+          <img src="${property.image}" alt="${property.title}" />
+        </div>
+        <div class="property-content">
+          <div class="meta">
+            <span class="badge badge-verified">✓ Verified</span>
+            <button class="save-button ${window.CopartmentUtils.getSavedProperties().includes(property.id) ? 'saved' : ''}" data-save-id="${property.id}" aria-label="Save property">♥</button>
+          </div>
+          <h3>${property.title}</h3>
+          <p class="location">📍 ${property.location}</p>
+          <div class="price-row">
+            <div>
+              <div class="price">${window.CopartmentUtils.formatCurrency(property.price)}</div>
+              <div class="muted">per ${property.period}</div>
+            </div>
+            <span class="property-tag">${property.accommodationType}</span>
+          </div>
+          <div class="property-feature-list">
+            <span class="property-tag">${property.availability}</span>
+          </div>
+          <div class="mt-2">
+            <a href="pages/property-details.html?id=${property.id}" class="btn btn-primary btn-lg" style="width:100%">View Details</a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    document.querySelectorAll('[data-save-id]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.saveId;
+        const saved = window.CopartmentUtils.saveProperty(id);
+        button.classList.toggle('saved', saved);
+        showToast(saved ? 'Property saved' : 'Property removed from saved list');
+      });
+    });
+  };
+
+  const renderLocations = () => {
+    const target = document.getElementById('locations-grid');
+    if (!target) return;
+    const locations = window.CopartmentUtils.getLocations();
+    target.innerHTML = locations.map((location) => `
+      <article class="location-card">
+        <div class="location-visual">${location.image}</div>
+        <div class="location-body">
+          <h3>${location.name}</h3>
+          <p class="muted">Verified homes, rooms and apartments</p>
+        </div>
+      </article>
+    `).join('');
+  };
+
+  const renderTestimonials = () => {
+    const target = document.getElementById('testimonials-grid');
+    if (!target) return;
+    const items = window.CopartmentUtils.getTestimonials();
+    target.innerHTML = items.map((item) => `
+      <article class="testimonial-card">
+        <div class="testimonial-body">
+          <p>“${item.text}”</p>
+          <div class="mt-2">
+            <strong>${item.name}</strong>
+            <div class="muted">${item.type}</div>
+          </div>
+        </div>
+      </article>
+    `).join('');
+  };
+
+  const renderPropertyCards = (properties, containerId) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!properties.length) {
+      container.innerHTML = `<div class="empty-state"><h3>No properties found</h3><p>Try adjusting your filters or search term.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = properties.map((property) => `
+      <article class="property-card">
+        <div class="property-image">
+          <img src="${property.image}" alt="${property.title}" />
+        </div>
+        <div class="property-content">
+          <div class="meta">
+            <span class="badge badge-verified">✓ Verified</span>
+            <button class="save-button ${window.CopartmentUtils.getSavedProperties().includes(property.id) ? 'saved' : ''}" data-save-id="${property.id}" aria-label="Save property">♥</button>
+          </div>
+          <h3>${property.title}</h3>
+          <p class="location">📍 ${property.location}</p>
+          <div class="price-row">
+            <div>
+              <div class="price">${window.CopartmentUtils.formatCurrency(property.price)}</div>
+              <div class="muted">per ${property.period}</div>
+            </div>
+            <span class="property-tag">${property.accommodationType}</span>
+          </div>
+          <div class="property-feature-list">
+            <span class="property-tag">${property.propertyType}</span>
+            <span class="property-tag">${property.availability}</span>
+          </div>
+          <div class="mt-2">
+            <a href="property-details.html?id=${property.id}" class="btn btn-primary btn-lg" style="width:100%">View Details</a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    document.querySelectorAll('[data-save-id]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.saveId;
+        const saved = window.CopartmentUtils.saveProperty(id);
+        button.classList.toggle('saved', saved);
+        showToast(saved ? 'Property saved' : 'Property removed from saved list');
+      });
+    });
+  };
+
+  const renderPropertyDetails = () => {
+    const container = document.getElementById('property-details-root');
+    if (!container) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const property = window.CopartmentUtils.getPropertyById(params.get('id'));
+
+    if (!property) {
+      container.innerHTML = '<div class="empty-state"><h3>Property not found</h3><p>The listing you requested is unavailable.</p></div>';
+      return;
+    }
+
+    const mainImage = property.images?.[0] || property.image;
+    const selectedImage = mainImage;
+
+    container.innerHTML = `
+      <div class="detail-layout">
+        <div>
+          <div class="gallery">
+            <div class="gallery-main">
+              <img id="gallery-main-image" src="${selectedImage}" alt="${property.title}" />
+            </div>
+            <div class="gallery-thumbs">
+              ${(property.images || [property.image]).map((image, index) => `
+                <button class="gallery-thumb ${index === 0 ? 'active' : ''}" data-image="${image}">
+                  <img src="${image}" alt="${property.title} view ${index + 1}" />
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="property-header mt-3">
+            <div class="property-title-row">
+              <div>
+                <h1>${property.title}</h1>
+                <p class="muted">${property.location}</p>
+              </div>
+              <span class="badge badge-verified">✓ Verified</span>
+            </div>
+            <div class="property-summary">
+              <span>${property.propertyType}</span>
+              <span>${property.accommodationType}</span>
+              <span>${property.availability}</span>
+              <span>${property.capacity} occupants</span>
+            </div>
+            <p>${property.description}</p>
+          </div>
+
+          <div class="section-card mt-3">
+            <h2>Amenities</h2>
+            <div class="property-feature-list mt-2">
+              ${(property.amenities || []).map((amenity) => `<span class="property-tag">${amenity}</span>`).join('')}
+            </div>
+          </div>
+
+          <div class="section-card mt-3">
+            <h2>Host</h2>
+            <div class="user-row mt-2">
+              <div class="avatar">${property.host.name.charAt(0)}</div>
+              <div>
+                <strong>${property.host.name}</strong>
+                <div class="muted">${property.host.role}</div>
+              </div>
+            </div>
+            <div class="property-summary">
+              <span>Host since ${property.host.since}</span>
+              <span>Response rate: ${property.host.responseRate}</span>
+              <span>Response time: ${property.host.responseTime}</span>
+            </div>
+          </div>
+
+          <div class="section-card mt-3">
+            <h2>Safety & Verification</h2>
+            <p class="mt-2">This listing has been vetted for basic safety and host information. Always confirm move-in details directly and use secure payment methods.</p>
+          </div>
+        </div>
+
+        <aside class="booking-panel">
+          <div class="booking-price">${window.CopartmentUtils.formatCurrency(property.price)}</div>
+          <div class="muted mb-2">per ${property.period}</div>
+
+          <form id="booking-request-form" class="booking-form">
+            <input type="hidden" name="propertyId" value="${property.id}" />
+            <div class="form-group">
+              <label for="move-in-date">Move-in date</label>
+              <input id="move-in-date" name="moveInDate" class="form-control" type="date" required>
+            </div>
+            <div class="form-group">
+              <label for="duration">Duration</label>
+              <select id="duration" name="duration" class="form-select" required>
+                <option value="1 month">1 month</option>
+                <option value="3 months">3 months</option>
+                <option value="6 months" selected>6 months</option>
+                <option value="12 months">12 months</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="occupants">Number of occupants</label>
+              <select id="occupants" name="occupants" class="form-select" required>
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="message">Additional message</label>
+              <textarea id="message" name="message" placeholder="Tell the host about your stay..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">Request Accommodation</button>
+          </form>
+        </aside>
+      </div>
+    `;
+
+    document.querySelectorAll('.gallery-thumb').forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        const src = thumb.dataset.image;
+        document.getElementById('gallery-main-image').src = src;
+        document.querySelectorAll('.gallery-thumb').forEach((item) => item.classList.toggle('active', item === thumb));
+      });
+    });
+
+    const bookingForm = document.getElementById('booking-request-form');
+    bookingForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const fields = new FormData(bookingForm);
+      const booking = {
+        propertyId: fields.get('propertyId'),
+        guest: 'Ada Okafor',
+        propertyName: property.title,
+        status: 'Pending',
+        date: fields.get('moveInDate'),
+        duration: fields.get('duration'),
+        occupants: fields.get('occupants'),
+        message: fields.get('message') || 'No additional message',
+        price: property.price
+      };
+      window.CopartmentUtils.createBooking(booking);
+      showToast('Accommodation request submitted');
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
+    });
+  };
+
+  const renderDashboard = () => {
+    const root = document.getElementById('dashboard-root');
+    if (!root) return;
+
+    const bookings = window.CopartmentUtils.getBookings();
+    const saved = window.CopartmentUtils.getSavedProperties();
+    const properties = window.CopartmentUtils.getProperties();
+    const currentUser = window.CopartmentUtils.getCurrentUser() || { name: 'Ada Okafor' };
+
+    const summary = [
+      { label: 'Active booking', value: bookings.filter((item) => item.status === 'Pending' || item.status === 'Accepted').length },
+      { label: 'Saved properties', value: saved.length },
+      { label: 'Upcoming move-in', value: bookings.filter((item) => item.status !== 'Declined').length },
+      { label: 'Notifications', value: window.CopartmentUtils.getNotifications().filter((n) => !n.read).length }
+    ];
+
+    root.innerHTML = `
+      <div class="page-header">
+        <div>
+          <h1>Welcome back, ${currentUser.name}</h1>
+          <p class="muted">Here’s your accommodation overview.</p>
+        </div>
+        <div class="inline-actions">
+          <a class="btn btn-outline" href="properties.html">Explore properties</a>
+          <a class="btn btn-primary" href="messages.html">Messages</a>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        ${summary.map((item) => `
+          <div class="metric-card">
+            <div class="value">${item.value}</div>
+            <div class="label">${item.label}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="two-col mt-3">
+        <div class="panel">
+          <h3>Recent requests</h3>
+          <div class="card-list mt-2">
+            ${bookings.slice(0, 3).map((booking) => `
+              <div class="listing-card">
+                <div class="header">
+                  <div>
+                    <div class="title">${booking.propertyName || 'Property request'}</div>
+                    <div class="sub">${booking.date || 'Requested'}</div>
+                  </div>
+                  <span class="badge badge-pending">${booking.status}</span>
+                </div>
+              </div>
+            `).join('') || '<div class="empty-state">No requests yet.</div>'}
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Saved properties</h3>
+          <div class="card-list mt-2">
+            ${saved.slice(0, 3).map((id) => {
+              const property = properties.find((p) => p.id === id);
+              return property ? `
+                <div class="listing-card">
+                  <div class="header">
+                    <div>
+                      <div class="title">${property.title}</div>
+                      <div class="sub">${property.location}</div>
+                    </div>
+                    <span class="price">${window.CopartmentUtils.formatCurrency(property.price)}</span>
+                  </div>
+                </div>
+              ` : '';
+            }).join('') || '<div class="empty-state">No saved properties yet.</div>'}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const renderMessages = () => {
+    const root = document.getElementById('messages-root');
+    if (!root) return;
+
+    const conversations = window.CopartmentUtils.getMessages();
+    const active = conversations[0];
+
+    root.innerHTML = `
+      <div class="chat-layout">
+        <aside class="conversation-list">
+          ${conversations.map((conversation) => `
+            <div class="conversation-item ${conversation.id === active.id ? 'active' : ''}" data-conversation-id="${conversation.id}">
+              <div class="user-row">
+                <div class="avatar">${conversation.participant.charAt(0)}</div>
+                <div style="flex:1">
+                  <strong>${conversation.participant}</strong>
+                  <div class="muted">${conversation.preview}</div>
+                </div>
+                ${conversation.unread ? '<span class="badge badge-pending">'+conversation.unread+'</span>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </aside>
+        <section class="chat-window">
+          <div class="chat-header">
+            <div class="user-row">
+              <div class="avatar">${active.participant.charAt(0)}</div>
+              <div>
+                <strong>${active.participant}</strong>
+                <div class="muted">Last active recently</div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-messages">
+            ${active.thread.map((message) => `
+              <div class="message-bubble ${message.sender === 'guest' ? 'outgoing' : 'incoming'}">
+                ${message.text}
+                <div class="muted mt-1">${message.time}</div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="chat-compose">
+            <input id="message-input" type="text" placeholder="Type your message..." class="form-control" />
+            <button id="send-message" class="btn btn-primary">Send</button>
+          </div>
+        </section>
+      </div>
+    `;
+
+    document.getElementById('send-message').addEventListener('click', () => {
+      const input = document.getElementById('message-input');
+      const value = input.value.trim();
+      if (!value) return;
+      window.CopartmentUtils.sendMessage(active.id, value);
+      input.value = '';
+      renderMessages();
+    });
+  };
+
+  const renderHostDashboard = () => {
+    const root = document.getElementById('host-dashboard-root');
+    if (!root) return;
+
+    const properties = window.CopartmentUtils.getProperties().slice(0, 4);
+    const stats = [
+      { label: 'Total properties', value: properties.length },
+      { label: 'Pending requests', value: window.CopartmentUtils.getBookings().length },
+      { label: 'Current bookings', value: 3 },
+      { label: 'Earnings', value: window.CopartmentUtils.formatCurrency(945000) }
+    ];
+
+    root.innerHTML = `
+      <div class="page-header">
+        <div>
+          <h1>Host dashboard</h1>
+          <p class="muted">Manage listings and guest relationships.</p>
+        </div>
+        <a class="btn btn-primary" href="add-property.html">Add property</a>
+      </div>
+      <div class="dashboard-grid">
+        ${stats.map((item) => `
+          <div class="metric-card">
+            <div class="value">${item.value}</div>
+            <div class="label">${item.label}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="two-col mt-3">
+        <div class="panel">
+          <h3>Recent listings</h3>
+          <div class="card-list mt-2">
+            ${properties.map((property) => `
+              <div class="listing-card">
+                <div class="header">
+                  <div>
+                    <div class="title">${property.title}</div>
+                    <div class="sub">${property.location}</div>
+                  </div>
+                  <span class="badge badge-verified">${property.status || 'Active'}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Performance</h3>
+          <div class="chart-box mt-2">
+            <div class="bar" style="height: 60%"></div>
+            <div class="bar" style="height: 78%"></div>
+            <div class="bar" style="height: 54%"></div>
+            <div class="bar" style="height: 88%"></div>
+            <div class="bar" style="height: 70%"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const renderAdminDashboard = () => {
+    const root = document.getElementById('admin-dashboard-root');
+    if (!root) return;
+
+    const properties = window.CopartmentUtils.getProperties();
+    const bookings = window.CopartmentUtils.getBookings();
+    root.innerHTML = `
+      <div class="page-header">
+        <div>
+          <h1>Admin overview</h1>
+          <p class="muted">Actionable platform monitoring.</p>
+        </div>
+      </div>
+      <div class="dashboard-grid">
+        <div class="metric-card"><div class="value">${properties.length}</div><div class="label">Total listings</div></div>
+        <div class="metric-card"><div class="value">${bookings.length}</div><div class="label">Active bookings</div></div>
+        <div class="metric-card"><div class="value">${properties.filter((p) => p.status === 'Pending Review').length}</div><div class="label">Pending verification</div></div>
+        <div class="metric-card"><div class="value">${window.CopartmentUtils.formatCurrency(2450000)}</div><div class="label">Revenue</div></div>
+      </div>
+      <div class="panel mt-3">
+        <h3>Platform activity</h3>
+        <div class="chart-box mt-2">
+          <div class="bar" style="height: 45%"></div>
+          <div class="bar" style="height: 62%"></div>
+          <div class="bar" style="height: 80%"></div>
+          <div class="bar" style="height: 70%"></div>
+          <div class="bar" style="height: 90%"></div>
+          <div class="bar" style="height: 72%"></div>
+        </div>
+      </div>
+    `;
+  };
+
+  const renderPropertyListPage = () => {
+    const results = document.getElementById('property-results');
+    if (!results) return;
+
+    const allProperties = window.CopartmentUtils.getProperties();
+    renderPropertyCards(allProperties, 'property-results');
+
+    const form = document.getElementById('property-filter-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const location = (formData.get('location') || '').toString().trim().toLowerCase();
+      const type = (formData.get('type') || '').toString();
+      const maxPrice = Number(formData.get('maxPrice') || 0);
+      const furnishedOnly = formData.get('furnished') === 'on';
+
+      const filtered = allProperties.filter((property) => {
+        const matchesLocation = !location || property.location.toLowerCase().includes(location) || property.city.toLowerCase().includes(location);
+        const matchesType = !type || property.accommodationType === type || property.propertyType === type;
+        const matchesPrice = !maxPrice || property.price <= maxPrice;
+        const matchesFurnishing = !furnishedOnly || property.furnished;
+        return matchesLocation && matchesType && matchesPrice && matchesFurnishing;
+      });
+
+      renderPropertyCards(filtered, 'property-results');
+    });
+
+    const toggleButtons = document.querySelectorAll('.toggle-button');
+    toggleButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        toggleButtons.forEach((item) => item.classList.toggle('active', item === button));
+        results.classList.toggle('list-view', button.dataset.view === 'list');
+      });
+    });
+  };
+
+  const initAuthForms = () => {
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+      loginForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(loginForm);
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const user = window.CopartmentUtils.getUserByEmail(email);
+
+        if (!user || !password) {
+          showToast('Invalid login details');
+          return;
+        }
+
+        window.CopartmentUtils.setCurrentUser(user);
+        showToast('Login successful');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+      });
+    }
+
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+      registerForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(registerForm);
+        const payload = {
+          name: formData.get('fullName'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          password: formData.get('password'),
+          role: formData.get('accountType') || 'Guest'
+        };
+        if (!payload.name || !payload.email || !payload.password) {
+          showToast('Please complete all required fields');
+          return;
+        }
+        window.CopartmentUtils.registerUser(payload);
+        showToast('Account created successfully');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+      });
+    }
+
+    const passwordField = document.getElementById('password');
+    const strengthBar = document.getElementById('password-strength');
+    if (passwordField && strengthBar) {
+      passwordField.addEventListener('input', (event) => {
+        const val = event.target.value;
+        let score = 0;
+        if (val.length >= 6) score += 25;
+        if (/[A-Z]/.test(val)) score += 25;
+        if (/[0-9]/.test(val)) score += 25;
+        if (/[^A-Za-z0-9]/.test(val)) score += 25;
+        strengthBar.style.width = `${score}%`;
+        strengthBar.style.background = score < 50 ? '#ef4444' : score < 75 ? '#f59e0b' : '#10b981';
+      });
+    }
+
+    document.querySelectorAll('.password-toggle').forEach((button) => {
+      button.addEventListener('click', () => {
+        const input = button.closest('.password-wrap').querySelector('input');
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        button.textContent = isHidden ? 'Hide' : 'Show';
+      });
+    });
+  };
+
+  const initPropertySubmission = () => {
+    const form = document.getElementById('property-form');
+    if (!form) return;
+
+    const steps = Array.from(document.querySelectorAll('.multi-step'));
+    const nextButtons = document.querySelectorAll('[data-next]');
+    const prevButtons = document.querySelectorAll('[data-prev]');
+    let currentStep = 0;
+
+    const updateStep = () => {
+      steps.forEach((step, index) => {
+        step.classList.toggle('active', index === currentStep);
+      });
+      document.getElementById('step-indicator').textContent = `${currentStep + 1} / ${steps.length}`;
+    };
+
+    nextButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        if (currentStep < steps.length - 1) {
+          currentStep += 1;
+          updateStep();
+        }
+      });
+    });
+
+    prevButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        if (currentStep > 0) {
+          currentStep -= 1;
+          updateStep();
+        }
+      });
+    });
+
+    const review = document.getElementById('review-output');
+    if (review) {
+      form.addEventListener('input', () => {
+        const formData = new FormData(form);
+        const values = Object.fromEntries(formData.entries());
+        review.innerHTML = `
+          <div><strong>Title:</strong> ${values.title || '—'}</div>
+          <div><strong>Location:</strong> ${values.city || '—'} / ${values.state || '—'}</div>
+          <div><strong>Price:</strong> ${window.CopartmentUtils.formatCurrency(Number(values.price || 0))}</div>
+          <div><strong>Type:</strong> ${values.propertyType || '—'}</div>
+          <div><strong>Amenities:</strong> ${values.amenities || 'None selected'}</div>
+        `;
+      });
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const payload = {
+        title: formData.get('title'),
+        propertyType: formData.get('propertyType'),
+        accommodationType: formData.get('accommodationType'),
+        description: formData.get('description'),
+        state: formData.get('state'),
+        city: formData.get('city'),
+        location: `${formData.get('city')}, ${formData.get('state')}`,
+        price: Number(formData.get('price') || 0),
+        period: formData.get('period') || 'month',
+        capacity: Number(formData.get('capacity') || 1),
+        rooms: Number(formData.get('rooms') || 1),
+        beds: Number(formData.get('beds') || 1),
+        furnished: formData.get('furnished') === 'yes',
+        amenities: [formData.get('amenities')].filter(Boolean),
+        image: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80',
+        images: ['https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80']
+      };
+      window.CopartmentUtils.createProperty(payload);
+      showToast('Property submitted and sent for verification');
+      setTimeout(() => { window.location.href = 'host-dashboard.html'; }, 1000);
+    });
+  };
+
+  const renderSavedProperties = () => {
+    const root = document.getElementById('saved-properties-root');
+    if (!root) return;
+    const savedIds = window.CopartmentUtils.getSavedProperties();
+    const properties = window.CopartmentUtils.getProperties().filter((property) => savedIds.includes(property.id));
+
+    if (!properties.length) {
+      root.innerHTML = '<div class="empty-state"><h3>No saved properties</h3><p>Save homes you like and keep track of them here.</p></div>';
+      return;
+    }
+
+    root.innerHTML = properties.map((property) => `
+      <article class="property-card">
+        <div class="property-image"><img src="${property.image}" alt="${property.title}" /></div>
+        <div class="property-content">
+          <div class="meta">
+            <h3>${property.title}</h3>
+            <button class="save-button saved" data-remove-save="${property.id}" aria-label="Remove saved property">♥</button>
+          </div>
+          <p class="location">📍 ${property.location}</p>
+          <div class="price-row">
+            <div class="price">${window.CopartmentUtils.formatCurrency(property.price)}</div>
+            <span class="property-tag">${property.availability}</span>
+          </div>
+          <div class="mt-2">
+            <a href="property-details.html?id=${property.id}" class="btn btn-primary btn-lg" style="width:100%">View Details</a>
+          </div>
+        </div>
+      </article>
+    `).join('');
+
+    document.querySelectorAll('[data-remove-save]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const id = button.dataset.removeSave;
+        window.CopartmentUtils.saveProperty(id);
+        renderSavedProperties();
+      });
+    });
+  };
+
+  const renderNotifications = () => {
+    const root = document.getElementById('notifications-root');
+    if (!root) return;
+    const notifications = window.CopartmentUtils.getNotifications();
+
+    root.innerHTML = notifications.map((item) => `
+      <div class="notification-item ${item.read ? '' : 'unread'}">
+        <div class="header">
+          <strong>${item.title}</strong>
+          ${item.read ? '' : '<span class="badge badge-pending">New</span>'}
+        </div>
+        <div class="muted mt-1">${item.detail}</div>
+        <div class="muted mt-1">${item.time}</div>
+      </div>
+    `).join('') || '<div class="empty-state">No notifications.</div>';
+  };
+
+  const init = () => {
+    if (page === 'home') {
+      renderFeaturedProperties();
+      renderLocations();
+      renderTestimonials();
+    }
+
+    if (page === 'properties') {
+      renderPropertyListPage();
+    }
+
+    if (page === 'property-details') {
+      renderPropertyDetails();
+    }
+
+    if (page === 'dashboard') {
+      renderDashboard();
+    }
+
+    if (page === 'messages') {
+      renderMessages();
+    }
+
+    if (page === 'host-dashboard') {
+      renderHostDashboard();
+    }
+
+    if (page === 'add-property') {
+      initPropertySubmission();
+    }
+
+    if (page === 'saved') {
+      renderSavedProperties();
+    }
+
+    if (page === 'notifications') {
+      renderNotifications();
+    }
+
+    if (page === 'admin') {
+      renderAdminDashboard();
+    }
+
+    initAuthForms();
+  };
+
+  init();
+});

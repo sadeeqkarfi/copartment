@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bookings | Copartment</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <link rel="stylesheet" href="../css/responsive.css" />
+</head>
+<body data-page="bookings">
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="../index.html" class="navbar-logo">
+        <span class="logo-icon">⌂</span>
+        <span class="logo-text">Copartment</span>
+      </a>
+      <button class="navbar-toggle" aria-label="Toggle navigation"><span></span><span></span><span></span></button>
+      <ul class="navbar-menu">
+        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+        <li><a href="bookings.html" class="nav-link">Bookings</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="page-section">
+    <div class="container">
+      <div class="page-header">
+        <div>
+          <h1>Bookings</h1>
+          <p class="muted">Your accommodation history and requests.</p>
+        </div>
+      </div>
+      <div class="table-card">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Move-in</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Private Room in Gwarinpa</td>
+              <td>2026-10-10</td>
+              <td>6 months</td>
+              <td><span class="badge badge-pending">Pending</span></td>
+              <td>₦180,000</td>
+            </tr>
+            <tr>
+              <td>Studio Apartment near Yaba</td>
+              <td>2026-11-02</td>
+              <td>4 months</td>
+              <td><span class="badge badge-verified">Accepted</span></td>
+              <td>₦260,000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
